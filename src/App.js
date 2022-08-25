@@ -2,12 +2,14 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getFacetedUniqueValues,
+  getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { useState } from "react";
 import { tableData } from "./tableData";
+import TableHeader from "./TableHeader";
 import "./App.css";
 
 function App() {
@@ -17,10 +19,12 @@ function App() {
   const columns = [
     columnHelper.accessor("name", {
       header: "이름",
+      filterFn: "equalsString",
       size: 60,
     }),
     columnHelper.accessor("phone", {
       header: "휴대폰",
+      enableColumnFilter: false,
       size: 300,
       enableSorting: false,
       cell: ({ renderValue }) =>
@@ -28,14 +32,17 @@ function App() {
     }),
     columnHelper.accessor("birth", {
       header: "생년월일",
+      enableColumnFilter: false,
       size: 80,
     }),
     columnHelper.accessor("register_date", {
       header: "등록일",
+      enableColumnFilter: false,
       size: 120,
     }),
     columnHelper.accessor("last_edit_date", {
       header: "최종수정일",
+      enableColumnFilter: false,
       size: 120,
     }),
   ];
@@ -45,6 +52,8 @@ function App() {
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
   return (
@@ -53,30 +62,7 @@ function App() {
         {table.getHeaderGroups().map((headerGroup) => (
           <tr key={headerGroup.id}>
             {headerGroup.headers.map((header) => (
-              <th
-                key={header.id}
-                style={{
-                  width: header.getSize(),
-                  cursor: header.column.getCanSort() ? "pointer" : "default",
-                }}
-                onClick={header.column.getToggleSortingHandler()}
-              >
-                {header.isPlaceholder
-                  ? null
-                  : flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                {
-                  {
-                    asc: <FaSortUp />,
-                    desc: <FaSortDown />,
-                  }[header.column.getIsSorted()]
-                }
-                {header.column.getCanSort() && !header.column.getIsSorted() ? (
-                  <FaSort />
-                ) : null}
-              </th>
+              <TableHeader header={header} key={header.id} />
             ))}
           </tr>
         ))}
